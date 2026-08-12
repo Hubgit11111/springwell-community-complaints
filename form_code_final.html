@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Noise & Pollution Complaint Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        input[type="text"], input[type="email"], input[type="date"], input[type="time"], select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .form-section {
+            border-top: 2px solid #eee;
+            padding-top: 20px;
+            margin-top: 20px;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        .required {
+            color: red;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h1>Community Complaint Form</h1>
+        <p style="text-align: center; color: #666;">Report noise or pollution issues to local authorities</p>
+
+        <!-- MAIN FORM: sends to formsubmit.co -->
+        <form action="https://formsubmit.co/robe-tyke-april@duck.com" method="POST">
+            <!-- HIDDEN FIELDS (users don't see these) -->
+            <!-- Email 2: the second government entity -->
+            <input type="hidden" name="_cc" value="carried-salon-opal@duck.com">
+            <!-- Reply-To: replies go back to the complainant -->
+            <input type="hidden" name="_replyto" value="email">
+            <!-- Optional: redirect to a thank you page after submission -->
+            <!-- <input type="hidden" name="_next" value="https://yourdomain.com/thankyou.html"> -->
+
+            <!-- SECTION 1: COMPLAINANT INFORMATION -->
+            <div class="form-section">
+                <h2 style="font-size: 18px; color: #333;">Your Information</h2>
+                <label for="name">Name <span class="required">*</span></label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="email">Email Address <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required>
+
+                <label for="email_confirm">Confirm Email Address <span class="required">*</span></label>
+                <input type="email" id="email_confirm" name="email_confirm" required>
+
+                <label for="street">Street Address <span class="required">*</span></label>
+                <input type="text" id="street" name="street" required>
+
+                <label for="postcode">Postcode <span class="required">*</span></label>
+                <input type="text" id="postcode" name="postcode" required>
+            </div>
+
+            <!-- SECTION 2: COMPLAINT DETAILS -->
+            <div class="form-section">
+                <h2 style="font-size: 18px; color: #333;">Complaint Details</h2>
+
+                <label for="nuisance_source">Source of Nuisance <span class="required">*</span></label>
+                <input type="text" id="nuisance_source" name="nuisance_source" value="Springwell Quarry operated by Thompsons of Prudhoe/ Ashcourt" required>
+
+                <label for="nuisance_type">Type of Nuisance <span class="required">*</span></label>
+                <select id="nuisance_type" name="nuisance_type" required>
+                    <option value="">-- Select a type --</option>
+                    <option value="Noise">Noise</option>
+                    <option value="Dust">Dust</option>
+                    <option value="Air Quality">Air Quality</option>
+                    <option value="Light Pollution">Light Pollution</option>
+                    <option value="Other">Other</option>
+                </select>
+
+                <!-- CONDITIONAL FIELD: Appears only when "Other" is selected -->
+                <div id="other_nuisance_container" class="hidden">
+                    <label for="other_nuisance_description">Please describe the other nuisance <span class="required">*</span></label>
+                    <input type="text" id="other_nuisance_description" name="other_nuisance_description">
+                </div>
+
+                <label for="occurrence_date">Date of Occurrence <span class="required">*</span></label>
+                <input type="date" id="occurrence_date" name="occurrence_date" required>
+
+                <div class="form-row">
+                    <div>
+                        <label for="time_started">Time Started <span class="required">*</span></label>
+                        <input type="time" id="time_started" name="time_started" required>
+                    </div>
+                    <div>
+                        <label for="time_finished">Time Finished <span class="required">*</span></label>
+                        <input type="time" id="time_finished" name="time_finished" required>
+                    </div>
+                </div>
+
+                <label for="effect_description">Description of Effect <span class="required">*</span></label>
+                <textarea id="effect_description" name="effect_description" placeholder="Describe how this nuisance affected you..." required></textarea>
+            </div>
+
+            <!-- SECTION 3: DECLARATION -->
+            <div class="form-section">
+                <h2 style="font-size: 18px; color: #333;">Declaration</h2>
+                <label for="declaration_date">Date <span class="required">*</span></label>
+                <input type="date" id="declaration_date" name="declaration_date" required>
+            </div>
+
+            <!-- SUBMIT BUTTON -->
+            <button type="submit">Submit Complaint</button>
+        </form>
+    </div>
+
+    <!-- JavaScript for validation and conditional field visibility -->
+    <script>
+        const form = document.querySelector('form');
+        const nuisanceTypeSelect = document.getElementById('nuisance_type');
+        const otherNuisanceContainer = document.getElementById('other_nuisance_container');
+        const otherNuisanceInput = document.getElementById('other_nuisance_description');
+
+        // Show/hide the "Other" description field based on dropdown selection
+        nuisanceTypeSelect.addEventListener('change', function() {
+            if (this.value === 'Other') {
+                otherNuisanceContainer.classList.remove('hidden');
+                otherNuisanceInput.required = true;
+            } else {
+                otherNuisanceContainer.classList.add('hidden');
+                otherNuisanceInput.required = false;
+                otherNuisanceInput.value = ''; // Clear the field
+            }
+        });
+
+        // Email validation on form submit
+        form.addEventListener('submit', function(e) {
+            const email = document.getElementById('email').value;
+            const emailConfirm = document.getElementById('email_confirm').value;
+
+            if (email !== emailConfirm) {
+                e.preventDefault();
+                alert('Email addresses do not match. Please check and try again.');
+            }
+        });
+    </script>
+</body>
+</html>
