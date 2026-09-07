@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Report Noise or Pollution</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#E7EBF2;
+    --card:#FFFFFF;
+    --ink:#1B2430;
+    --ink-soft:#57616F;
+    --council:#26418F;
+    --agency:#2F6B4F;
+    --alert:#B5432A;
+    --line:#CBD2DC;
+    --focus:#26418F;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    background-image:radial-gradient(circle at 1px 1px, rgba(27,36,48,0.06) 1px, transparent 0);
+    background-size:22px 22px;
+    color:var(--ink);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    min-height:100vh;
+    padding:48px 16px 80px;
+  }
+  .wrap{max-width:640px; margin:0 auto; position:relative;}
+  .sheet{
+    position:relative; z-index:1; background:var(--card); border-radius:6px;
+    box-shadow:0 1px 2px rgba(27,36,48,0.06), 0 18px 40px -18px rgba(27,36,48,0.35);
+    padding:40px 36px 36px;
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600;
+    letter-spacing:0.12em; color:var(--ink-soft); text-transform:uppercase; margin:0 0 10px;
+  }
+  h1{
+    font-family:'IBM Plex Mono', monospace; font-size:26px; font-weight:700;
+    line-height:1.25; margin:0 0 10px; letter-spacing:-0.01em;
+  }
+  .intro{font-size:15px; line-height:1.55; color:var(--ink-soft); margin:0 0 30px; max-width:56ch;}
+
+  fieldset{border:none; padding:0; margin:0 0 30px;}
+  .section-head{
+    display:flex; align-items:baseline; gap:10px; border-bottom:1px solid var(--line);
+    padding-bottom:8px; margin-bottom:20px;
+  }
+  .section-num{
+    font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:700; color:var(--council);
+    background:rgba(38,65,143,0.08); border-radius:50%; width:22px; height:22px;
+    display:flex; align-items:center; justify-content:center; flex:none;
+  }
+  legend.section-title{
+    font-family:'IBM Plex Mono', monospace; font-size:13px; font-weight:600;
+    letter-spacing:0.03em; text-transform:uppercase; color:var(--ink); padding:0;
+  }
+  .row{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  .field{margin-bottom:16px;}
+  .field.full{grid-column:1/-1;}
+  label{display:block; font-size:13px; font-weight:600; margin-bottom:6px; color:var(--ink);}
+  label .opt{font-weight:400; color:var(--ink-soft); font-size:12px;}
+  input, select, textarea{
+    width:100%; font-family:'IBM Plex Sans', sans-serif; font-size:14.5px; color:var(--ink);
+    background:#FBFCFD; border:1px solid var(--line); border-radius:5px; padding:10px 12px;
+  }
+  textarea{resize:vertical; min-height:110px; line-height:1.5;}
+  input:focus, select:focus, textarea:focus{
+    outline:2px solid var(--focus); outline-offset:1px; border-color:var(--focus);
+  }
+  .counter{font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); margin-top:5px; text-align:right;}
+  .counter.warn{color:var(--alert); font-weight:600;}
+  .counter.near{color:#8A5A1E; font-weight:600;}
+
+  .declaration-text{font-size:13.5px; line-height:1.6; color:var(--ink-soft); margin:0 0 16px;}
+
+  .consent{display:flex; align-items:flex-start; gap:8px; font-size:13.5px; font-weight:400; color:var(--ink); cursor:pointer; margin-top:4px;}
+  .consent input{width:auto; margin-top:3px; flex:none;}
+  .consent + .consent{margin-top:10px;}
+
+  .actions{display:flex; flex-direction:column; gap:10px; margin-top:8px;}
+  button{
+    font-family:'IBM Plex Mono', monospace; font-weight:600; font-size:14px;
+    letter-spacing:0.02em; border-radius:5px; padding:14px 18px; cursor:pointer; border:1px solid transparent;
+  }
+  #sendBtn{background:var(--council); color:#fff; box-shadow:0 8px 18px -8px rgba(38,65,143,0.55);}
+  #sendBtn:hover{background:#1d3576;}
+  #sendBtn:disabled{background:#B9C0CC; box-shadow:none; cursor:not-allowed;}
+  #copyToggle{background:transparent; color:var(--ink-soft); border:1px solid var(--line); font-weight:500;}
+  #copyToggle:hover{border-color:var(--ink-soft); color:var(--ink);}
+
+  .status{font-size:13px; padding:12px 14px; border-radius:5px; margin-top:14px; display:none; line-height:1.5;}
+  .status.show{display:block;}
+  .status.ok{background:#EAF4EE; color:#215C3E; border:1px solid #BFE0CC;}
+  .status.err{background:#FBEAE6; color:var(--alert); border:1px solid #F1C7BB;}
+
+  .fallback{display:none; margin-top:16px; border:1px dashed var(--line); border-radius:6px; padding:16px; background:#FAFAF9;}
+  .fallback.show{display:block;}
+  .fallback p{font-size:13px; color:var(--ink-soft); margin:0 0 10px;}
+  .fallback pre{
+    white-space:pre-wrap; word-break:break-word; font-family:'IBM Plex Mono', monospace; font-size:12px;
+    background:#fff; border:1px solid var(--line); border-radius:5px; padding:12px; max-height:220px; overflow:auto;
+  }
+  .addr-list a{color:var(--council); font-family:'IBM Plex Mono', monospace; font-size:12.5px;}
+  .addr-list{margin:10px 0;}
+
+  details{margin-top:30px; border-top:1px solid var(--line); padding-top:16px;}
+  summary{font-family:'IBM Plex Mono', monospace; font-size:12px; font-weight:600; color:var(--ink-soft); cursor:pointer;}
+  details p{font-size:13px; line-height:1.6; color:var(--ink-soft);}
+
+  .hidden{display:none;}
+  .required{color:var(--alert);}
+
+  @media (max-width:520px){
+    body{padding:32px 12px 60px;}
+    .sheet{padding:30px 20px 26px;}
+    h1{font-size:22px;}
+    .row{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="sheet">
+    <p class="eyebrow">Community reporting form</p>
+    <h1>Report noise or pollution</h1>
+    <p class="intro">Fill in personal and complaint details to generate nuisance report. It turns into a single email, which then may be sent from your own email inbox or using your default email app, to Sunderland Council and the Environment Agency. You may want your details stored on this device for future submissions.</p>
+
+    <form id="complaintForm" novalidate>
+
+      <fieldset>
+        <div class="section-head">
+          <span class="section-num">1</span>
+          <legend class="section-title">Your Information</legend>
+        </div>
+
+        <div class="field">
+          <label for="name">Name <span class="required">*</span></label>
+          <input type="text" id="name" required>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="email">Email Address <span class="required">*</span></label>
+            <input type="email" id="email" required>
+          </div>
+          <div class="field">
+            <label for="email_confirm">Confirm Email Address <span class="required">*</span></label>
+            <input type="email" id="email_confirm" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="street">Street Address <span class="required">*</span></label>
+          <input type="text" id="street" required>
+        </div>
+
+        <div class="field">
+          <label for="postcode">Postcode <span class="required">*</span></label>
+          <input type="text" id="postcode" required>
+        </div>
+
+        <div class="field full">
+          <label class="consent" for="rememberMe">
+            <input type="checkbox" id="rememberMe">
+            <span>Remember my name and address on this device for next submission</span>
+          </label>
+          <label class="consent" for="forgetMe">
+            <input type="checkbox" id="forgetMe">
+            <span>Forget my details</span>
+          </label>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="section-head">
+          <span class="section-num">2</span>
+          <legend class="section-title">Complaint Details</legend>
+        </div>
+
+        <div class="field">
+          <label for="nuisance_source">Source of Nuisance <span class="required">*</span></label>
+          <input type="text" id="nuisance_source" value="Springwell Quarry operated by Thompsons of Prudhoe/ Ashcourt" required>
+        </div>
+
+        <div class="field">
+          <label for="nuisance_type">Type of Nuisance <span class="required">*</span></label>
+          <select id="nuisance_type" required>
+            <option value="">-- Select a type --</option>
+            <option>Noise</option>
+            <option>Dust</option>
+            <option>Air Quality</option>
+            <option>Light Pollution</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div id="other_nuisance_container" class="field hidden">
+          <label for="other_nuisance_description">Please describe the other nuisance <span class="required">*</span></label>
+          <input type="text" id="other_nuisance_description">
+        </div>
+
+        <div class="field">
+          <label for="occurrence_date">Date of Occurrence <span class="required">*</span></label>
+          <input type="date" id="occurrence_date" required>
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="time_started">Time Started <span class="required">*</span></label>
+            <input type="time" id="time_started" required>
+          </div>
+          <div class="field">
+            <label for="time_finished">Time Finished <span class="required">*</span></label>
+            <input type="time" id="time_finished" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="effect_description">Description of Effect <span class="required">*</span></label>
+          <textarea id="effect_description" maxlength="1000" placeholder="Describe how this nuisance affected you..." required></textarea>
+          <div class="counter" id="descCounter">0 / 1000 characters</div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <div class="section-head">
+          <span class="section-num">3</span>
+          <legend class="section-title">Declaration</legend>
+        </div>
+        <p class="declaration-text">I confirm the above details are accurate to the best of my knowledge.</p>
+        <div class="field">
+          <label for="declaration_date">Date <span class="required">*</span></label>
+          <input type="date" id="declaration_date" required>
+        </div>
+      </fieldset>
+
+      <div class="counter" id="totalCounter">Total email length: 0 / ~1800 safe characters</div>
+
+      <div class="actions">
+        <button type="submit" id="sendBtn">Prepare email in my mail app →</button>
+        <button type="button" id="copyToggle">Trouble opening your email app? Copy the text instead</button>
+      </div>
+
+      <div class="status" id="status"></div>
+
+      <div class="fallback" id="fallback">
+        <p>Copy the message below, open a new email yourself, paste it in, and send it to the two addresses shown.</p>
+        <div class="addr-list" id="addrList"></div>
+        <pre id="fallbackText"></pre>
+        <button type="button" id="copyBtn" style="margin-top:10px;background:var(--council);color:#fff;">Copy text to clipboard</button>
+      </div>
+    </form>
+
+    <details>
+      <summary>Why nothing here gets stored</summary>
+      <p>This page has no server behind it. When you click "Prepare email," your browser builds a standard <code>mailto:</code> link from what you've typed and hands it to your device's own email app — the same as clicking someone's email address on any website. Nothing you type is sent to us or stored anywhere online. If you tick "Remember my name and address," that's saved only in this browser on this device — never sent anywhere — and you can remove it any time by ticking "Forget my details." The email that goes out is sent from your own account, so it genuinely comes from you — it isn't relayed or spoofed by any third party.</p>
+    </details>
+  </div>
+</div>
+
+<script>
+  // ---- EDIT THESE TWO ADDRESSES BEFORE DEPLOYING ----
+  const RECIPIENTS = [
+    "public.health@sunderland.gov.uk",
+    "northeast-newcastle@environment-agency.gov.uk"
+  ];
+  // ----------------------------------------------------
+
+  const SAFE_LIMIT = 1800;        // conservative cross-client mailto safe length
+  const DESCRIPTION_MAX = 1000;   // matches the textarea's maxlength
+  const DETAILS_KEY = 'noiseComplaintDetails';
+  const CHOICE_KEY = 'noiseComplaintRememberChoice';
+
+  const form = document.getElementById('complaintForm');
+  const nuisanceTypeSelect = document.getElementById('nuisance_type');
+  const otherContainer = document.getElementById('other_nuisance_container');
+  const otherInput = document.getElementById('other_nuisance_description');
+  const descField = document.getElementById('effect_description');
+  const descCounter = document.getElementById('descCounter');
+  const totalCounter = document.getElementById('totalCounter');
+  const status = document.getElementById('status');
+  const fallback = document.getElementById('fallback');
+  const copyToggle = document.getElementById('copyToggle');
+  const fallbackText = document.getElementById('fallbackText');
+  const addrList = document.getElementById('addrList');
+  const copyBtn = document.getElementById('copyBtn');
+  const rememberCheckbox = document.getElementById('rememberMe');
+  const forgetCheckbox = document.getElementById('forgetMe');
+
+  addrList.innerHTML = RECIPIENTS.map(a => `<a href="mailto:${a}">${a}</a>`).join(' &nbsp;·&nbsp; ');
+
+  // Default the declaration date to today, for convenience
+  document.getElementById('declaration_date').value = new Date().toISOString().slice(0, 10);
+
+  // ---- Remember / forget details ----
+  function loadSavedPreference() {
+    let choice = null;
+    try { choice = localStorage.getItem(CHOICE_KEY); } catch (e) {}
+
+    if (choice === 'remember') {
+      rememberCheckbox.checked = true;
+      forgetCheckbox.checked = false;
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem(DETAILS_KEY) || 'null'); } catch (e) {}
+      if (saved) {
+        document.getElementById('name').value = saved.name || '';
+        document.getElementById('email').value = saved.email || '';
+        document.getElementById('email_confirm').value = saved.email || '';
+        document.getElementById('street').value = saved.street || '';
+        document.getElementById('postcode').value = saved.postcode || '';
+      }
+    } else if (choice === 'forget') {
+      forgetCheckbox.checked = true;
+      rememberCheckbox.checked = false;
+    }
+    // if no choice saved yet, both stay unticked — the person must pick one
+  }
+  loadSavedPreference();
+
+  rememberCheckbox.addEventListener('change', function () {
+    if (this.checked) {
+      forgetCheckbox.checked = false;
+      try { localStorage.setItem(CHOICE_KEY, 'remember'); } catch (e) {}
+      status.classList.remove('show');
+    }
+  });
+
+  forgetCheckbox.addEventListener('change', function () {
+    if (this.checked) {
+      rememberCheckbox.checked = false;
+      try {
+        localStorage.setItem(CHOICE_KEY, 'forget');
+        localStorage.removeItem(DETAILS_KEY);
+      } catch (e) {}
+      status.classList.remove('show');
+    }
+  });
+
+  function saveDetailsIfNeeded() {
+    if (rememberCheckbox.checked) {
+      const details = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        street: document.getElementById('street').value.trim(),
+        postcode: document.getElementById('postcode').value.trim()
+      };
+      try { localStorage.setItem(DETAILS_KEY, JSON.stringify(details)); } catch (e) {}
+    }
+  }
+
+  // Show/hide the "Other" description field based on dropdown selection
+  nuisanceTypeSelect.addEventListener('change', function () {
+    if (this.value === 'Other') {
+      otherContainer.classList.remove('hidden');
+      otherInput.required = true;
+    } else {
+      otherContainer.classList.add('hidden');
+      otherInput.required = false;
+      otherInput.value = '';
+    }
+  });
+
+  function buildEmail() {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const street = document.getElementById('street').value.trim();
+    const postcode = document.getElementById('postcode').value.trim();
+
+    const source = document.getElementById('nuisance_source').value.trim();
+    let type = nuisanceTypeSelect.value;
+    if (type === 'Other' && otherInput.value.trim()) {
+      type = `Other: ${otherInput.value.trim()}`;
+    }
+    const occurrenceDate = document.getElementById('occurrence_date').value;
+    const timeStarted = document.getElementById('time_started').value;
+    const timeFinished = document.getElementById('time_finished').value;
+    const effect = descField.value.trim();
+    const declarationDate = document.getElementById('declaration_date').value;
+
+    const subject = `${type || 'Complaint'} — ${source || 'nuisance report'} — ${occurrenceDate || ''}`.trim();
+
+    const body =
+`COMPLAINT DETAILS
+Source of nuisance: ${source}
+Type of nuisance: ${type}
+Date of occurrence: ${occurrenceDate}
+Time: ${timeStarted} to ${timeFinished}
+
+Description of effect:
+${effect}
+
+COMPLAINANT DETAILS
+Name: ${name}
+Email: ${email}
+Street address: ${street}
+Postcode: ${postcode}
+
+DECLARATION
+I confirm the above details are accurate to the best of my knowledge.
+Date: ${declarationDate}
+${name}
+
+This report was prepared using a self-service community form and sent directly from the complainant's own email account. It has not been stored or forwarded by any third party.`;
+
+    return { subject, body };
+  }
+
+  function updateCounters() {
+    const len = descField.value.length;
+    descCounter.textContent = `${len} / ${DESCRIPTION_MAX} characters`;
+    descCounter.classList.remove('warn', 'near');
+    if (len >= DESCRIPTION_MAX) {
+      descCounter.classList.add('warn');
+    } else if (len >= DESCRIPTION_MAX * 0.9) {
+      descCounter.classList.add('near');
+    }
+
+    const { subject, body } = buildEmail();
+    const mailto = `mailto:${RECIPIENTS.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const total = mailto.length;
+
+    totalCounter.textContent = `Total email length: ${total} / ~${SAFE_LIMIT} safe characters`;
+    totalCounter.classList.toggle('warn', total > SAFE_LIMIT);
+    if (total > SAFE_LIMIT) {
+      totalCounter.textContent += ' — please shorten your description';
+    }
+    return total;
+  }
+
+  form.addEventListener('input', updateCounters);
+  updateCounters();
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    status.className = 'status';
+    status.style.display = 'none';
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
+    if (!rememberCheckbox.checked && !forgetCheckbox.checked) {
+      status.textContent = 'Please choose whether to remember or forget your details before sending.';
+      status.className = 'status err show';
+      return;
+    }
+
+    const email = document.getElementById('email').value.trim();
+    const emailConfirm = document.getElementById('email_confirm').value.trim();
+    if (email !== emailConfirm) {
+      status.textContent = 'Your email addresses don\'t match — please check and try again.';
+      status.className = 'status err show';
+      return;
+    }
+
+    const total = updateCounters();
+    if (total > SAFE_LIMIT) {
+      status.textContent = 'Your description is a bit long for some email apps to open automatically. Please trim it, or use the copy option below instead.';
+      status.className = 'status err show';
+      return;
+    }
+
+    saveDetailsIfNeeded();
+
+    const { subject, body } = buildEmail();
+    const mailto = `mailto:${RECIPIENTS.join(',')}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    window.location.href = mailto;
+
+    status.textContent = 'Opening your email app now with everything filled in — just check it over and hit send. If nothing opens within a few seconds, use "Copy the text instead" below.';
+    status.className = 'status ok show';
+
+    fallbackText.textContent = `To: ${RECIPIENTS.join(', ')}\nSubject: ${subject}\n\n${body}`;
+  });
+
+  copyToggle.addEventListener('click', function () {
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+    if (!rememberCheckbox.checked && !forgetCheckbox.checked) {
+      status.textContent = 'Please choose whether to remember or forget your details before continuing.';
+      status.className = 'status err show';
+      return;
+    }
+    saveDetailsIfNeeded();
+    const { subject, body } = buildEmail();
+    fallbackText.textContent = `To: ${RECIPIENTS.join(', ')}\nSubject: ${subject}\n\n${body}`;
+    fallback.classList.toggle('show');
+  });
+
+  copyBtn.addEventListener('click', async function () {
+    try {
+      await navigator.clipboard.writeText(fallbackText.textContent);
+      copyBtn.textContent = 'Copied ✓';
+      setTimeout(() => copyBtn.textContent = 'Copy text to clipboard', 1800);
+    } catch (err) {
+      copyBtn.textContent = 'Could not copy — select the text manually';
+    }
+  });
+</script>
+</body>
+</html>
