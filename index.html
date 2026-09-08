@@ -122,6 +122,7 @@
 
   .hidden{display:none;}
   .required{color:var(--alert);}
+  input.field-error{border-color:var(--alert);}
 
   @media (max-width:520px){
     body{padding:32px 12px 60px;}
@@ -304,12 +305,24 @@
   const copyBtn = document.getElementById('copyBtn');
   const rememberCheckbox = document.getElementById('rememberMe');
   const forgetCheckbox = document.getElementById('forgetMe');
+  const emailField = document.getElementById('email');
+  const emailConfirmField = document.getElementById('email_confirm');
 
   addrList.innerHTML = RECIPIENTS.map(a => `<a href="mailto:${a}">${a}</a>`).join(' &nbsp;·&nbsp; ');
   document.getElementById('refNo').textContent = `Ref. No.: ${REF_NO}`;
 
   // Default the declaration date to today, for convenience
   document.getElementById('declaration_date').value = new Date().toISOString().slice(0, 10);
+
+  // Clear the red "doesn't match" outline live, as soon as the two email fields agree again
+  function clearEmailErrorIfMatch() {
+    if (emailField.value.trim() === emailConfirmField.value.trim()) {
+      emailField.classList.remove('field-error');
+      emailConfirmField.classList.remove('field-error');
+    }
+  }
+  emailField.addEventListener('input', clearEmailErrorIfMatch);
+  emailConfirmField.addEventListener('input', clearEmailErrorIfMatch);
 
   // ---- Remember / forget details ----
   function loadSavedPreference() {
@@ -323,8 +336,8 @@
       try { saved = JSON.parse(localStorage.getItem(DETAILS_KEY) || 'null'); } catch (e) {}
       if (saved) {
         document.getElementById('name').value = saved.name || '';
-        document.getElementById('email').value = saved.email || '';
-        document.getElementById('email_confirm').value = saved.email || '';
+        emailField.value = saved.email || '';
+        emailConfirmField.value = saved.email || '';
         document.getElementById('street').value = saved.street || '';
         document.getElementById('postcode').value = saved.postcode || '';
       }
@@ -359,7 +372,7 @@
     if (rememberCheckbox.checked) {
       const details = {
         name: document.getElementById('name').value.trim(),
-        email: document.getElementById('email').value.trim(),
+        email: emailField.value.trim(),
         street: document.getElementById('street').value.trim(),
         postcode: document.getElementById('postcode').value.trim()
       };
@@ -381,7 +394,7 @@
 
   function buildEmail() {
     const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
+    const email = emailField.value.trim();
     const street = document.getElementById('street').value.trim();
     const postcode = document.getElementById('postcode').value.trim();
 
@@ -455,27 +468,39 @@
   form.addEventListener('input', updateCounters);
   updateCounters();
 
-  form.addEventListener('submit', function (e) {
-    e.preventDefault();
-    status.className = 'status';
-    status.style.display = 'none';
-
+  // Checks both buttons must pass before doing anything else, so neither path can skip a rule the other enforces
+  function validateSharedRules() {
     if (!form.checkValidity()) {
       form.reportValidity();
-      return;
+      return false;
     }
 
     if (!rememberCheckbox.checked && !forgetCheckbox.checked) {
-      status.textContent = 'Please choose whether to remember or forget your details before sending.';
+      status.textContent = 'Please choose whether to remember or forget your details before continuing.';
       status.className = 'status err show';
-      return;
+      return false;
     }
 
-    const email = document.getElementById('email').value.trim();
-    const emailConfirm = document.getElementById('email_confirm').value.trim();
+    const email = emailField.value.trim();
+    const emailConfirm = emailConfirmField.value.trim();
     if (email !== emailConfirm) {
       status.textContent = 'Your email addresses don\'t match — please check and try again.';
       status.className = 'status err show';
+      emailField.classList.add('field-error');
+      emailConfirmField.classList.add('field-error');
+      return false;
+    }
+    emailField.classList.remove('field-error');
+    emailConfirmField.classList.remove('field-error');
+
+    status.classList.remove('show');
+    return true;
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    if (!validateSharedRules()) {
       return;
     }
 
@@ -500,13 +525,7 @@
   });
 
   copyToggle.addEventListener('click', function () {
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-    if (!rememberCheckbox.checked && !forgetCheckbox.checked) {
-      status.textContent = 'Please choose whether to remember or forget your details before continuing.';
-      status.className = 'status err show';
+    if (!validateSharedRules()) {
       return;
     }
     saveDetailsIfNeeded();
