@@ -35,9 +35,17 @@
     box-shadow:0 1px 2px rgba(27,36,48,0.06), 0 18px 40px -18px rgba(27,36,48,0.35);
     padding:40px 36px 36px;
   }
+  .eyebrow-row{
+    display:flex; justify-content:space-between; align-items:baseline;
+    flex-wrap:wrap; gap:8px 16px; margin:0 0 10px;
+  }
   .eyebrow{
     font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600;
-    letter-spacing:0.12em; color:var(--ink-soft); text-transform:uppercase; margin:0 0 10px;
+    letter-spacing:0.12em; color:var(--ink-soft); text-transform:uppercase; margin:0;
+  }
+  .ref-no{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; font-weight:600;
+    letter-spacing:0.02em; color:var(--ink-soft); margin:0;
   }
   h1{
     font-family:'IBM Plex Mono', monospace; font-size:26px; font-weight:700;
@@ -126,8 +134,11 @@
 <body>
 <div class="wrap">
   <div class="sheet">
-    <p class="eyebrow">Community reporting form</p>
-    <h1>Report noise or pollution</h1>
+    <div class="eyebrow-row">
+      <p class="eyebrow">Community reporting form</p>
+      <p class="ref-no" id="refNo"></p>
+    </div>
+    <h1>Nuisance Complaint Record Form</h1>
     <p class="intro">Fill in personal and complaint details to generate nuisance report. It turns into a single email, which then may be sent from your own email inbox or using your default email app, to Sunderland Council and the Environment Agency. You may want your details stored on this device for future submissions.</p>
 
     <form id="complaintForm" novalidate>
@@ -271,6 +282,7 @@
   ];
   // ----------------------------------------------------
 
+  const REF_NO = "HP3530BS";      // update this if the reference number ever changes
   const SAFE_LIMIT = 1800;        // conservative cross-client mailto safe length
   const DESCRIPTION_MAX = 1000;   // matches the textarea's maxlength
   const DETAILS_KEY = 'noiseComplaintDetails';
@@ -293,6 +305,7 @@
   const forgetCheckbox = document.getElementById('forgetMe');
 
   addrList.innerHTML = RECIPIENTS.map(a => `<a href="mailto:${a}">${a}</a>`).join(' &nbsp;·&nbsp; ');
+  document.getElementById('refNo').textContent = `Ref. No.: ${REF_NO}`;
 
   // Default the declaration date to today, for convenience
   document.getElementById('declaration_date').value = new Date().toISOString().slice(0, 10);
@@ -385,7 +398,9 @@
     const subject = `${type || 'Complaint'} — ${source || 'nuisance report'} — ${occurrenceDate || ''}`.trim();
 
     const body =
-`COMPLAINT DETAILS
+`Ref. No.: ${REF_NO}
+
+COMPLAINT DETAILS
 Source of nuisance: ${source}
 Type of nuisance: ${type}
 Date of occurrence: ${occurrenceDate}
@@ -476,7 +491,7 @@ This report was prepared using a self-service community form and sent directly f
     status.textContent = 'Opening your email app now with everything filled in — just check it over and hit send. If nothing opens within a few seconds, use "Copy the text instead" below.';
     status.className = 'status ok show';
 
-    fallbackText.textContent = `To: ${RECIPIENTS.join(', ')}\nSubject: ${subject}\n\n${body}`;
+    fallbackText.textContent = `To: ${RECIPIENTS.join(', ')}\nRef. No.: ${REF_NO}\nSubject: ${subject}\n\n${body}`;
   });
 
   copyToggle.addEventListener('click', function () {
@@ -491,7 +506,7 @@ This report was prepared using a self-service community form and sent directly f
     }
     saveDetailsIfNeeded();
     const { subject, body } = buildEmail();
-    fallbackText.textContent = `To: ${RECIPIENTS.join(', ')}\nSubject: ${subject}\n\n${body}`;
+    fallbackText.textContent = `To: ${RECIPIENTS.join(', ')}\nRef. No.: ${REF_NO}\nSubject: ${subject}\n\n${body}`;
     fallback.classList.toggle('show');
   });
 
