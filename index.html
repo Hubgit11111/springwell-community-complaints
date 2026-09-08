@@ -283,6 +283,7 @@
   // ----------------------------------------------------
 
   const REF_NO = "HP3530BS";      // update this if the reference number ever changes
+  const CRLF = '\r\n';           // CRLF instead of a plain \n — several mobile mail apps (notably Gmail) only render line breaks correctly with CRLF
   const SAFE_LIMIT = 1800;        // conservative cross-client mailto safe length
   const DESCRIPTION_MAX = 1000;   // matches the textarea's maxlength
   const DETAILS_KEY = 'noiseComplaintDetails';
@@ -397,30 +398,34 @@
 
     const subject = `${type || 'Complaint'} — ${source || 'nuisance report'} — ${occurrenceDate || ''}`.trim();
 
-    const body =
-`Ref. No.: ${REF_NO}
+    const effectCRLF = effect.replace(/\r\n|\r|\n/g, CRLF);
 
-COMPLAINT DETAILS
-Source of nuisance: ${source}
-Type of nuisance: ${type}
-Date of occurrence: ${occurrenceDate}
-Time: ${timeStarted} to ${timeFinished}
-
-Description of effect:
-${effect}
-
-COMPLAINANT DETAILS
-Name: ${name}
-Email: ${email}
-Street address: ${street}
-Postcode: ${postcode}
-
-DECLARATION
-I confirm the above details are accurate to the best of my knowledge.
-Date: ${declarationDate}
-${name}
-
-This report was prepared using a self-service community form and sent directly from the complainant's own email account. It has not been stored or forwarded by any third party.`;
+    const bodyLines = [
+      `Ref. No.: ${REF_NO}`,
+      '',
+      'COMPLAINT DETAILS',
+      `Source of nuisance: ${source}`,
+      `Type of nuisance: ${type}`,
+      `Date of occurrence: ${occurrenceDate}`,
+      `Time: ${timeStarted} to ${timeFinished}`,
+      '',
+      'Description of effect:',
+      effectCRLF,
+      '',
+      'COMPLAINANT DETAILS',
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Street address: ${street}`,
+      `Postcode: ${postcode}`,
+      '',
+      'DECLARATION',
+      'I confirm the above details are accurate to the best of my knowledge.',
+      `Date: ${declarationDate}`,
+      name,
+      '',
+      "This report was prepared using a self-service community form and sent directly from the complainant's own email account. It has not been stored or forwarded by any third party."
+    ];
+    const body = bodyLines.join(CRLF);
 
     return { subject, body };
   }
@@ -491,7 +496,7 @@ This report was prepared using a self-service community form and sent directly f
     status.textContent = 'Opening your email app now with everything filled in — just check it over and hit send. If nothing opens within a few seconds, use "Copy the text instead" below.';
     status.className = 'status ok show';
 
-    fallbackText.textContent = `To: ${RECIPIENTS.join(', ')}\nRef. No.: ${REF_NO}\nSubject: ${subject}\n\n${body}`;
+    fallbackText.textContent = [`To: ${RECIPIENTS.join(', ')}`, `Subject: ${subject}`, '', body].join(CRLF);
   });
 
   copyToggle.addEventListener('click', function () {
@@ -506,7 +511,7 @@ This report was prepared using a self-service community form and sent directly f
     }
     saveDetailsIfNeeded();
     const { subject, body } = buildEmail();
-    fallbackText.textContent = `To: ${RECIPIENTS.join(', ')}\nRef. No.: ${REF_NO}\nSubject: ${subject}\n\n${body}`;
+    fallbackText.textContent = [`To: ${RECIPIENTS.join(', ')}`, `Subject: ${subject}`, '', body].join(CRLF);
     fallback.classList.toggle('show');
   });
 
