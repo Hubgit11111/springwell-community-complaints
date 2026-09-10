@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Report Noise or Pollution</title>
+<title>Nuisance Complaint Record Form</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -254,8 +254,8 @@
       <div class="counter" id="totalCounter">Total email length: 0 / ~1800 safe characters</div>
 
       <div class="actions">
-        <button type="submit" id="sendBtn">Prepare email in my mail app →</button>
-        <button type="button" id="copyToggle">Trouble opening your email app? Copy the text instead</button>
+        <button type="submit" id="sendBtn" data-goatcounter-click="springwell-nuisance-form-prepare-email">Prepare email in my mail app →</button>
+        <button type="button" id="copyToggle" data-goatcounter-click="springwell-nuisance-form-copy-text">Trouble opening your email app? Copy the text instead</button>
       </div>
 
       <div class="status" id="status"></div>
@@ -270,11 +270,14 @@
 
     <details>
       <summary>Why nothing here gets stored</summary>
-      <p>This page has no server behind it. When you click "Prepare email," your browser builds a standard <code>mailto:</code> link from what you've typed and hands it to your device's own email app — the same as clicking someone's email address on any website. Nothing you type is sent to us or stored anywhere online. If you tick "Remember my name and address," that's saved only in this browser on this device — never sent anywhere — and you can remove it any time by ticking "Forget my details." The email that goes out is sent from your own account, so it genuinely comes from you — it isn't relayed or spoofed by any third party.</p>
+      <p>This page has no server behind it. When you click "Prepare email," your browser builds a standard <code>mailto:</code> link from what you've typed and hands it to your device's own email app — the same as clicking someone's email address on any website. Nothing you type is sent to us or stored anywhere online. If you tick "Remember my name and address," that's saved only in this browser on this device — never sent anywhere — and you can remove it any time by ticking "Forget my details." The email that goes out is sent from your own account, so it genuinely comes from you — it isn't relayed or spoofed by any third party. This page also uses a free, cookie-free analytics tool (GoatCounter) to count anonymous visits and button clicks — it collects no personal data and can't identify who used the form.</p>
     </details>
+
+    <p style="margin-top:18px; font-size:11.5px; color:var(--ink-soft); text-align:center;">This form was created in collaboration with Anthropic's Claude AI model.</p>
   </div>
 </div>
 
+<script data-goatcounter="https://privacymetrics.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 <script>
   // ---- EDIT THESE TWO ADDRESSES BEFORE DEPLOYING ----
   const RECIPIENTS = [
